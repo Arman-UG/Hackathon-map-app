@@ -1,9 +1,31 @@
 body {
-  font-family: Arial;
-  margin: 20px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
 }
 
+/* header */
+h1 {
+  margin: 0;
+  padding: 12px;
+  background: #2f3640;
+  color: white;
+}
+
+/* toolbar */
+.toolbar {
+  padding: 10px;
+  background: #dcdde1;
+}
+
+/* ⭐ THIS IS THE IMPORTANT PART */
 #map {
-  height: 500px;
-  border: 2px solid black;
+  width: 100%;
+  height: 500px;   /* FIXED HEIGHT – GUARANTEED WORK */
+  border-top: 2px solid #ccc;
+}
+
+/* panel */
+.panel {
+  padding: 10px;
 }

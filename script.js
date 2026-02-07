@@ -1,6 +1,8 @@
 // =============================
 // MAP SETUP
 // =============================
+document.addEventListener("DOMContentLoaded", () => {
+
 const map = L.map("map").setView([20, 78], 6);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
@@ -10,6 +12,8 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 // FEATURES
 // =============================
 
+let highlightLayers = [];
+
 let features = [
   {
     name: "Highway",
@@ -18,16 +22,34 @@ let features = [
     coords: [[20, 77], [20, 79]],
     color: "red"
   },
+
+  {
+    name: "Railway",
+    priority: 2,
+    width: 6,
+    coords: [[19.99, 77], [19.99, 79]],
+    color: "black"
+  },
+
+  {
+    name: "River",
+    priority: 3,
+    width: 10,
+    coords: [[20.015, 77], [20.015, 79]],
+    color: "cyan"
+  },
+
   {
     name: "Road A",
-    priority: 2,
+    priority: 4,
     width: 8,
     coords: [[20.02, 77], [20.02, 79]],
     color: "blue"
   },
+
   {
     name: "Road B",
-    priority: 2,
+    priority: 4,
     width: 8,
     coords: [[20.01, 77], [20.01, 79]],
     color: "green"
@@ -109,6 +131,10 @@ detectBtn.addEventListener("click", () => {
 
 reportBtn.addEventListener("click", () => {
 
+  // remove old highlights
+  highlightLayers.forEach(l => map.removeLayer(l));
+  highlightLayers = [];
+
   let conflicts = [];
 
   for (let i = 0; i < features.length; i++) {
@@ -117,10 +143,25 @@ reportBtn.addEventListener("click", () => {
       const A = features[i];
       const B = features[j];
 
-      const overlap = turf.booleanIntersects(getBuffered(A), getBuffered(B));
+      const bufA = getBuffered(A);
+      const bufB = getBuffered(B);
+
+      const overlap = turf.intersect(bufA, bufB);
 
       if (overlap) {
+
         conflicts.push(`${A.name} overlaps ${B.name}`);
+
+        // draw highlight
+        const layer = L.geoJSON(overlap, {
+          style: {
+            color: "yellow",
+            fillColor: "orange",
+            fillOpacity: 0.5
+          }
+        }).addTo(map);
+
+        highlightLayers.push(layer);
       }
     }
   }
@@ -130,4 +171,87 @@ reportBtn.addEventListener("click", () => {
   } else {
     report.innerHTML = "<b>Conflicts:</b><br>" + conflicts.join("<br>");
   }
+});
+
+// =============================
+// FILE UPLOAD
+// =============================
+
+const fileInput = document.getElementById("fileInput");
+
+fileInput.addEventListener("change", (e) => {
+
+  const file = e.target.files[0];
+
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+
+    const geojson = JSON.parse(event.target.result);
+
+    // clear old layers
+    features.forEach(f => map.removeLayer(f.layer));
+    features = [];
+
+    // load new features
+    geojson.features.forEach((feat, index) => {
+
+      const color = ["red","blue","green","black","cyan"][index % 5];
+
+      const layer = L.geoJSON(feat, {
+        style: { color, weight: 8 }
+      }).addTo(map);
+
+      features.push({
+        name: feat.properties?.name || `Feature ${index}`,
+        priority: feat.properties?.priority || 3,
+        width: 8,
+        layer,
+        color
+      });
+    });
+
+    report.innerHTML = "File loaded successfully ✅";
+  };
+
+  reader.readAsText(file);
+});
+
+// =============================
+// EXPORT GEOJSON
+// =============================
+
+const exportBtn = document.getElementById("exportBtn");
+
+exportBtn.addEventListener("click", () => {
+
+  // convert all layers back to GeoJSON
+  const geojson = {
+    type: "FeatureCollection",
+    features: features.map(f => {
+      const gj = f.layer.toGeoJSON();
+      gj.properties = {
+        name: f.name,
+        priority: f.priority
+      };
+      return gj;
+    })
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(geojson, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fixed_map.geojson";
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  report.innerHTML = "File exported successfully ✅";
+});
 });
