@@ -209,5 +209,5 @@ If given more time:
 
 We confirm that this submission is our own work and was developed during the hackathon period.
 
-Team Representative Name: <Arman>  
+Team Representative Name: Arman  
 Confirmation: Yes
