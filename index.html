@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Map Overlap Detector</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <h2>Overlap Detection Demo</h2>
+
+  <button id="detectBtn">Detect & Fix Overlaps</button>
+
+  <button id="reportBtn">Generate Report</button>
+
+  <p id="report"></p>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Turf JS -->
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>
