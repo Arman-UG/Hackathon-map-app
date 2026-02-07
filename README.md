@@ -2,7 +2,7 @@
 
 ## TEAM DETAILS
 
-Team Name: <Arr automation>  
+Team Name: Arr automation  
 Problem Statement Chosen: Problem 3 – Displacement with AI  
 Team Members: <Rohit, Arman, Harish>  
 GitHub Repository Link: <https://arman-ug.github.io/Hackathon-map-app/>  
